@@ -4,7 +4,7 @@
 #
 Name     : libnl
 Version  : 3.2.25
-Release  : 11
+Release  : 12
 URL      : http://www.infradead.org/~tgr/libnl/files/libnl-3.2.25.tar.gz
 Source0  : http://www.infradead.org/~tgr/libnl/files/libnl-3.2.25.tar.gz
 Summary  : Generic Netlink Library
