@@ -4,7 +4,7 @@
 #
 Name     : libnl
 Version  : 3.2.25
-Release  : 14
+Release  : 15
 URL      : http://www.infradead.org/~tgr/libnl/files/libnl-3.2.25.tar.gz
 Source0  : http://www.infradead.org/~tgr/libnl/files/libnl-3.2.25.tar.gz
 Summary  : Generic Netlink Library
@@ -16,6 +16,12 @@ Requires: libnl-data
 Requires: libnl-doc
 BuildRequires : bison
 BuildRequires : flex
+BuildRequires : gcc-dev32
+BuildRequires : gcc-libgcc32
+BuildRequires : gcc-libstdc++32
+BuildRequires : glibc-dev32
+BuildRequires : glibc-libc32
+BuildRequires : pkgconfig(32check)
 BuildRequires : pkgconfig(check)
 
 %description
@@ -45,9 +51,22 @@ Group: Development
 Requires: libnl-lib
 Requires: libnl-bin
 Requires: libnl-data
+Provides: libnl-devel
 
 %description dev
 dev components for the libnl package.
+
+
+%package dev32
+Summary: dev32 components for the libnl package.
+Group: Default
+Requires: libnl-lib32
+Requires: libnl-bin
+Requires: libnl-data
+Requires: libnl-dev
+
+%description dev32
+dev32 components for the libnl package.
 
 
 %package doc
@@ -67,31 +86,66 @@ Requires: libnl-data
 lib components for the libnl package.
 
 
+%package lib32
+Summary: lib32 components for the libnl package.
+Group: Default
+Requires: libnl-data
+
+%description lib32
+lib32 components for the libnl package.
+
+
 %prep
 %setup -q -n libnl-3.2.25
+pushd ..
+cp -a libnl-3.2.25 build32
+popd
 
 %build
+export LANG=C
+export SOURCE_DATE_EPOCH=1482959729
 %configure --disable-static --sysconfdir=/usr/share/defaults
-make V=1 %{?_smp_mflags}
+make V=1  %{?_smp_mflags}
 
+pushd ../build32/
+export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
+export CFLAGS="$CFLAGS -m32"
+export CXXFLAGS="$CXXFLAGS -m32"
+export LDFLAGS="$LDFLAGS -m32"
+%configure --disable-static --sysconfdir=/usr/share/defaults  --libdir=/usr/lib32 --build=i686-generic-linux-gnu --host=i686-generic-linux-gnu --target=i686-clr-linux-gnu
+make V=1  %{?_smp_mflags}
+popd
 %check
+export LANG=C
+export http_proxy=http://127.0.0.1:9/
+export https_proxy=http://127.0.0.1:9/
+export no_proxy=localhost
 make VERBOSE=1 V=1 %{?_smp_mflags} check
 
 %install
 rm -rf %{buildroot}
+pushd ../build32/
+%make_install32
+if [ -d  %{buildroot}/usr/lib32/pkgconfig ]
+then
+pushd %{buildroot}/usr/lib32/pkgconfig
+for i in *.pc ; do ln -s $i 32$i ; done
+popd
+fi
+popd
 %make_install
 
 %files
 %defattr(-,root,root,-)
-/usr/lib64/libnl/cli/cls/basic.so
-/usr/lib64/libnl/cli/cls/cgroup.so
-/usr/lib64/libnl/cli/qdisc/bfifo.so
-/usr/lib64/libnl/cli/qdisc/blackhole.so
-/usr/lib64/libnl/cli/qdisc/fq_codel.so
-/usr/lib64/libnl/cli/qdisc/htb.so
-/usr/lib64/libnl/cli/qdisc/ingress.so
-/usr/lib64/libnl/cli/qdisc/pfifo.so
-/usr/lib64/libnl/cli/qdisc/plug.so
+/usr/lib32/libnl/cli/cls/basic.so
+/usr/lib32/libnl/cli/cls/cgroup.so
+/usr/lib32/libnl/cli/qdisc/bfifo.so
+/usr/lib32/libnl/cli/qdisc/blackhole.so
+/usr/lib32/libnl/cli/qdisc/fq_codel.so
+/usr/lib32/libnl/cli/qdisc/htb.so
+/usr/lib32/libnl/cli/qdisc/ingress.so
+/usr/lib32/libnl/cli/qdisc/pfifo.so
+/usr/lib32/libnl/cli/qdisc/plug.so
 
 %files bin
 %defattr(-,root,root,-)
@@ -219,8 +273,36 @@ rm -rf %{buildroot}
 /usr/include/libnl3/netlink/types.h
 /usr/include/libnl3/netlink/utils.h
 /usr/include/libnl3/netlink/version.h
-/usr/lib64/*.so
-/usr/lib64/pkgconfig/*.pc
+/usr/lib64/libnl-3.so
+/usr/lib64/libnl-cli-3.so
+/usr/lib64/libnl-genl-3.so
+/usr/lib64/libnl-idiag-3.so
+/usr/lib64/libnl-nf-3.so
+/usr/lib64/libnl-route-3.so
+/usr/lib64/pkgconfig/libnl-3.0.pc
+/usr/lib64/pkgconfig/libnl-cli-3.0.pc
+/usr/lib64/pkgconfig/libnl-genl-3.0.pc
+/usr/lib64/pkgconfig/libnl-nf-3.0.pc
+/usr/lib64/pkgconfig/libnl-route-3.0.pc
+
+%files dev32
+%defattr(-,root,root,-)
+/usr/lib32/libnl-3.so
+/usr/lib32/libnl-cli-3.so
+/usr/lib32/libnl-genl-3.so
+/usr/lib32/libnl-idiag-3.so
+/usr/lib32/libnl-nf-3.so
+/usr/lib32/libnl-route-3.so
+/usr/lib32/pkgconfig/32libnl-3.0.pc
+/usr/lib32/pkgconfig/32libnl-cli-3.0.pc
+/usr/lib32/pkgconfig/32libnl-genl-3.0.pc
+/usr/lib32/pkgconfig/32libnl-nf-3.0.pc
+/usr/lib32/pkgconfig/32libnl-route-3.0.pc
+/usr/lib32/pkgconfig/libnl-3.0.pc
+/usr/lib32/pkgconfig/libnl-cli-3.0.pc
+/usr/lib32/pkgconfig/libnl-genl-3.0.pc
+/usr/lib32/pkgconfig/libnl-nf-3.0.pc
+/usr/lib32/pkgconfig/libnl-route-3.0.pc
 
 %files doc
 %defattr(-,root,root,-)
@@ -228,4 +310,39 @@ rm -rf %{buildroot}
 
 %files lib
 %defattr(-,root,root,-)
-/usr/lib64/*.so.*
+/usr/lib64/libnl-3.so.200
+/usr/lib64/libnl-3.so.200.20.0
+/usr/lib64/libnl-cli-3.so.200
+/usr/lib64/libnl-cli-3.so.200.20.0
+/usr/lib64/libnl-genl-3.so.200
+/usr/lib64/libnl-genl-3.so.200.20.0
+/usr/lib64/libnl-idiag-3.so.200
+/usr/lib64/libnl-idiag-3.so.200.20.0
+/usr/lib64/libnl-nf-3.so.200
+/usr/lib64/libnl-nf-3.so.200.20.0
+/usr/lib64/libnl-route-3.so.200
+/usr/lib64/libnl-route-3.so.200.20.0
+/usr/lib64/libnl/cli/cls/basic.so
+/usr/lib64/libnl/cli/cls/cgroup.so
+/usr/lib64/libnl/cli/qdisc/bfifo.so
+/usr/lib64/libnl/cli/qdisc/blackhole.so
+/usr/lib64/libnl/cli/qdisc/fq_codel.so
+/usr/lib64/libnl/cli/qdisc/htb.so
+/usr/lib64/libnl/cli/qdisc/ingress.so
+/usr/lib64/libnl/cli/qdisc/pfifo.so
+/usr/lib64/libnl/cli/qdisc/plug.so
+
+%files lib32
+%defattr(-,root,root,-)
+/usr/lib32/libnl-3.so.200
+/usr/lib32/libnl-3.so.200.20.0
+/usr/lib32/libnl-cli-3.so.200
+/usr/lib32/libnl-cli-3.so.200.20.0
+/usr/lib32/libnl-genl-3.so.200
+/usr/lib32/libnl-genl-3.so.200.20.0
+/usr/lib32/libnl-idiag-3.so.200
+/usr/lib32/libnl-idiag-3.so.200.20.0
+/usr/lib32/libnl-nf-3.so.200
+/usr/lib32/libnl-nf-3.so.200.20.0
+/usr/lib32/libnl-route-3.so.200
+/usr/lib32/libnl-route-3.so.200.20.0
