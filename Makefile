@@ -1,5 +1,5 @@
 PKG_NAME := libnl
-URL := http://www.infradead.org/~tgr/libnl/files/libnl-3.2.25.tar.gz
+URL := https://github.com/thom311/libnl/releases/download/libnl3_2_29/libnl-3.2.29.tar.gz
 
 
 include ../common/Makefile.common
