@@ -4,25 +4,29 @@
 #
 Name     : libnl
 Version  : 3.4.0
-Release  : 18
-URL      : https://github.com/thom311/libnl/releases/download/libnl3_4_0/libnl-3.4.0.tar.gz
-Source0  : https://github.com/thom311/libnl/releases/download/libnl3_4_0/libnl-3.4.0.tar.gz
+Release  : 19
+URL      : https://github.com/thom311/libnl/archive/libnl3_4_0.tar.gz
+Source0  : https://github.com/thom311/libnl/archive/libnl3_4_0.tar.gz
 Summary  : Netlink Routing Family Library
 Group    : Development/Tools
-License  : LGPL-2.0 LGPL-2.1
+License  : GPL-3.0 LGPL-2.0 LGPL-2.1
 Requires: libnl-bin
 Requires: libnl-lib
 Requires: libnl-data
 Requires: libnl-doc
 BuildRequires : bison
+BuildRequires : doxygen
 BuildRequires : flex
 BuildRequires : gcc-dev32
 BuildRequires : gcc-libgcc32
 BuildRequires : gcc-libstdc++32
 BuildRequires : glibc-dev32
 BuildRequires : glibc-libc32
+BuildRequires : graphviz
 BuildRequires : pkgconfig(32check)
 BuildRequires : pkgconfig(check)
+BuildRequires : python-dev
+BuildRequires : sed
 
 %description
 ***************************************************************************
@@ -96,9 +100,9 @@ lib32 components for the libnl package.
 
 
 %prep
-%setup -q -n libnl-3.4.0
+%setup -q -n libnl-libnl3_4_0
 pushd ..
-cp -a libnl-3.4.0 build32
+cp -a libnl-libnl3_4_0 build32
 popd
 
 %build
@@ -106,8 +110,8 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1507574399
-%configure --disable-static --sysconfdir=/usr/share/defaults
+export SOURCE_DATE_EPOCH=1507589314
+%autogen --disable-static --sysconfdir=/usr/share/defaults
 make V=1  %{?_smp_mflags}
 
 pushd ../build32/
@@ -115,7 +119,7 @@ export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
 export CFLAGS="$CFLAGS -m32"
 export CXXFLAGS="$CXXFLAGS -m32"
 export LDFLAGS="$LDFLAGS -m32"
-%configure --disable-static --sysconfdir=/usr/share/defaults   --libdir=/usr/lib32 --build=i686-generic-linux-gnu --host=i686-generic-linux-gnu --target=i686-clr-linux-gnu
+%autogen --disable-static --sysconfdir=/usr/share/defaults  --libdir=/usr/lib32 --build=i686-generic-linux-gnu --host=i686-generic-linux-gnu --target=i686-clr-linux-gnu
 make V=1  %{?_smp_mflags}
 popd
 %check
@@ -126,7 +130,7 @@ export no_proxy=localhost,127.0.0.1,0.0.0.0
 make VERBOSE=1 V=1 %{?_smp_mflags} check
 
 %install
-export SOURCE_DATE_EPOCH=1507574399
+export SOURCE_DATE_EPOCH=1507589314
 rm -rf %{buildroot}
 pushd ../build32/
 %make_install32
