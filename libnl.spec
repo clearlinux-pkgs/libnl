@@ -4,7 +4,7 @@
 #
 Name     : libnl
 Version  : 3.4.0
-Release  : 20
+Release  : 21
 URL      : https://github.com/thom311/libnl/archive/libnl3_4_0.tar.gz
 Source0  : https://github.com/thom311/libnl/archive/libnl3_4_0.tar.gz
 Summary  : Netlink Routing Family Library
