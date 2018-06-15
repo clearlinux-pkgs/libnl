@@ -25,7 +25,7 @@ BuildRequires : glibc-libc32
 BuildRequires : graphviz
 BuildRequires : pkgconfig(32check)
 BuildRequires : pkgconfig(check)
-BuildRequires : python-dev
+
 BuildRequires : sed
 
 %description
