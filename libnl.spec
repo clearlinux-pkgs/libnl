@@ -4,16 +4,18 @@
 #
 Name     : libnl
 Version  : 3.4.0
-Release  : 23
+Release  : 24
 URL      : https://github.com/thom311/libnl/archive/libnl3_4_0.tar.gz
 Source0  : https://github.com/thom311/libnl/archive/libnl3_4_0.tar.gz
 Summary  : Netlink Routing Family Library
 Group    : Development/Tools
 License  : GPL-3.0 LGPL-2.0 LGPL-2.1
-Requires: libnl-bin
-Requires: libnl-lib
-Requires: libnl-data
-Requires: libnl-doc
+Requires: libnl-bin = %{version}-%{release}
+Requires: libnl-data = %{version}-%{release}
+Requires: libnl-lib = %{version}-%{release}
+Requires: libnl-license = %{version}-%{release}
+Requires: libnl-man = %{version}-%{release}
+BuildRequires : asciidoc
 BuildRequires : bison
 BuildRequires : doxygen
 BuildRequires : flex
@@ -23,9 +25,9 @@ BuildRequires : gcc-libstdc++32
 BuildRequires : glibc-dev32
 BuildRequires : glibc-libc32
 BuildRequires : graphviz
+BuildRequires : pkg-config
 BuildRequires : pkgconfig(32check)
 BuildRequires : pkgconfig(check)
-
 BuildRequires : sed
 
 %description
@@ -35,7 +37,8 @@ NOTE: The python wrapper is experimental and may or may not work.
 %package bin
 Summary: bin components for the libnl package.
 Group: Binaries
-Requires: libnl-data
+Requires: libnl-data = %{version}-%{release}
+Requires: libnl-license = %{version}-%{release}
 
 %description bin
 bin components for the libnl package.
@@ -52,10 +55,11 @@ data components for the libnl package.
 %package dev
 Summary: dev components for the libnl package.
 Group: Development
-Requires: libnl-lib
-Requires: libnl-bin
-Requires: libnl-data
-Provides: libnl-devel
+Requires: libnl-lib = %{version}-%{release}
+Requires: libnl-bin = %{version}-%{release}
+Requires: libnl-data = %{version}-%{release}
+Provides: libnl-devel = %{version}-%{release}
+Requires: libnl = %{version}-%{release}
 
 %description dev
 dev components for the libnl package.
@@ -64,27 +68,20 @@ dev components for the libnl package.
 %package dev32
 Summary: dev32 components for the libnl package.
 Group: Default
-Requires: libnl-lib32
-Requires: libnl-bin
-Requires: libnl-data
-Requires: libnl-dev
+Requires: libnl-lib32 = %{version}-%{release}
+Requires: libnl-bin = %{version}-%{release}
+Requires: libnl-data = %{version}-%{release}
+Requires: libnl-dev = %{version}-%{release}
 
 %description dev32
 dev32 components for the libnl package.
 
 
-%package doc
-Summary: doc components for the libnl package.
-Group: Documentation
-
-%description doc
-doc components for the libnl package.
-
-
 %package lib
 Summary: lib components for the libnl package.
 Group: Libraries
-Requires: libnl-data
+Requires: libnl-data = %{version}-%{release}
+Requires: libnl-license = %{version}-%{release}
 
 %description lib
 lib components for the libnl package.
@@ -93,10 +90,27 @@ lib components for the libnl package.
 %package lib32
 Summary: lib32 components for the libnl package.
 Group: Default
-Requires: libnl-data
+Requires: libnl-data = %{version}-%{release}
+Requires: libnl-license = %{version}-%{release}
 
 %description lib32
 lib32 components for the libnl package.
+
+
+%package license
+Summary: license components for the libnl package.
+Group: Default
+
+%description license
+license components for the libnl package.
+
+
+%package man
+Summary: man components for the libnl package.
+Group: Default
+
+%description man
+man components for the libnl package.
 
 
 %prep
@@ -109,29 +123,43 @@ popd
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-export LANG=C
-export SOURCE_DATE_EPOCH=1507589314
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1569530816
+export GCC_IGNORE_WERROR=1
+export AR=gcc-ar
+export RANLIB=gcc-ranlib
+export NM=gcc-nm
+export CFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export FCFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export FFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export CXXFLAGS="$CXXFLAGS -O3 -ffat-lto-objects -flto=4 "
 %autogen --disable-static --sysconfdir=/usr/share/defaults
-make V=1  %{?_smp_mflags}
+make  %{?_smp_mflags}
 
 pushd ../build32/
 export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
-export CFLAGS="$CFLAGS -m32"
-export CXXFLAGS="$CXXFLAGS -m32"
-export LDFLAGS="$LDFLAGS -m32"
+export ASFLAGS="${ASFLAGS}${ASFLAGS:+ }--32"
+export CFLAGS="${CFLAGS}${CFLAGS:+ }-m32 -mstackrealign"
+export CXXFLAGS="${CXXFLAGS}${CXXFLAGS:+ }-m32 -mstackrealign"
+export LDFLAGS="${LDFLAGS}${LDFLAGS:+ }-m32 -mstackrealign"
 %autogen --disable-static --sysconfdir=/usr/share/defaults  --libdir=/usr/lib32 --build=i686-generic-linux-gnu --host=i686-generic-linux-gnu --target=i686-clr-linux-gnu
-make V=1  %{?_smp_mflags}
+make  %{?_smp_mflags}
 popd
 %check
-export LANG=C
+export LANG=C.UTF-8
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 make VERBOSE=1 V=1 %{?_smp_mflags} check
+cd ../build32;
+make VERBOSE=1 V=1 %{?_smp_mflags} check || :
 
 %install
-export SOURCE_DATE_EPOCH=1507589314
+export SOURCE_DATE_EPOCH=1569530816
 rm -rf %{buildroot}
+mkdir -p %{buildroot}/usr/share/package-licenses/libnl
+cp COPYING %{buildroot}/usr/share/package-licenses/libnl/COPYING
+cp doc/COPYING %{buildroot}/usr/share/package-licenses/libnl/doc_COPYING
 pushd ../build32/
 %make_install32
 if [ -d  %{buildroot}/usr/lib32/pkgconfig ]
@@ -361,10 +389,6 @@ popd
 /usr/lib32/pkgconfig/libnl-route-3.0.pc
 /usr/lib32/pkgconfig/libnl-xfrm-3.0.pc
 
-%files doc
-%defattr(-,root,root,-)
-%doc /usr/share/man/man8/*
-
 %files lib
 %defattr(-,root,root,-)
 /usr/lib64/libnl-3.so.200
@@ -418,3 +442,17 @@ popd
 /usr/lib32/libnl/cli/qdisc/ingress.so
 /usr/lib32/libnl/cli/qdisc/pfifo.so
 /usr/lib32/libnl/cli/qdisc/plug.so
+
+%files license
+%defattr(0644,root,root,0755)
+/usr/share/package-licenses/libnl/COPYING
+/usr/share/package-licenses/libnl/doc_COPYING
+
+%files man
+%defattr(0644,root,root,0755)
+/usr/share/man/man8/genl-ctrl-list.8
+/usr/share/man/man8/nl-classid-lookup.8
+/usr/share/man/man8/nl-pktloc-lookup.8
+/usr/share/man/man8/nl-qdisc-add.8
+/usr/share/man/man8/nl-qdisc-delete.8
+/usr/share/man/man8/nl-qdisc-list.8
