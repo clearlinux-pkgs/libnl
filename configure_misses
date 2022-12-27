@@ -1,6 +1,6 @@
-Configure miss: source-highlight
+Configure miss: i686-generic-linux-gnu-file
 Configure miss: mscgen
 Configure miss: pygmentize
 Configure miss: source-highlight
-Configure miss: mscgen
-Configure miss: pygmentize
+Configure miss: source-highlight
+Configure miss: x86_64-generic-linux-gnu-file
