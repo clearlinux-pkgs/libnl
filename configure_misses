@@ -1,5 +1,11 @@
+Configure miss: g++ option to enable C++11 features
+Configure miss: g++ option to enable C++11 features
+Configure miss: gcc options needed to detect all undeclared functions
+Configure miss: gcc options needed to detect all undeclared functions
 Configure miss: i686-generic-linux-gnu-file
 Configure miss: mscgen
+Configure miss: mscgen
+Configure miss: pygmentize
 Configure miss: pygmentize
 Configure miss: source-highlight
 Configure miss: source-highlight
